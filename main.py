@@ -1,48 +1,77 @@
 import requests
 
-cat_and_dog = requests.get('https://storage.googleapis.com/petbacker/images/blog/2017/dog-and-cat-cover.jpg')
-url =cat_and_dog.json()
-print(cat_and_dog.json())
+TOKEN = '5643654386:AAGaxNP-8Kkwzi8Ko047p0BZBd3t6a0eIu4'
 
-# TOKEN = '5643654386:AAGaxNP-8Kkwzi8Ko047p0BZBd3t6a0eIu4'
+def get_updates(TOKEN):
+    updates = requests.get(f'https://api.telegram.org/bot{TOKEN}/getUpdates')
+    updates = updates.json()
+    return updates
 
-# def get_updates(TOKEN):
-#     updates = requests.get(f'https://api.telegram.org/bot{TOKEN}/getUpdates')
-#     updates = updates.json()
-#     r = requests.get('https://dog.ceo/api/breeds/image/random')
-#     data = r.json()
-#     return updates,data
+def dog(chat_id):
+    Dog = requests.get('https://random.dog/woof.json')
+    dog_data = Dog.json()['url']
+    data = {
+            'chat_id':chat_id,
+            'photo':dog_data
+            }
+    requests.post(f'https://api.telegram.org/bot{TOKEN}/sendPhoto',json=data)
 
-# def get_lastupdate(updates,data):
-#     last_update = updates['result'][-1]
-#     chat_id = last_update['message']['chat']['id']
-#     text = last_update['message']['text']
-#     message_id = last_update['message']['message_id']
-#     img_url = data.get('message')
-#     return chat_id,message_id,img_url
+def cat(chat_id):    
+    Cat = requests.get('https://aws.random.cat/meow')
+    url= Cat.json()['file']
+    data1 = {
+                'chat_id':chat_id,
+                'photo':url,
+            }
+        
+    requests.post(f'https://api.telegram.org/bot{TOKEN}/sendPhoto',json=data1)
+def get_button(chat_id):
+        
+    button1 = {'text':'😺CAT'}
+    button2 = {'text':'🐶DOG'}
 
-# def send_message(TOKEN,chat_id,img_url):
-#     url = f'https://api.telegram.org/bot{TOKEN}/sendPhoto'
-#     data = {
-#             'chat_id':chat_id,
-#             'photo':img_url
-#             # 'text':text
-#         }
-
-#     r = requests.post(url,data=data)    
+    keyboard = [[button1,button2]]
     
-# # print(r.status_code)
+    reply_markup = {'keyboard':keyboard,'resize_keyboard':True}
+    data = {
+            'chat_id':chat_id,
+            'text':text,
+            'reply_markup':reply_markup
+        }
+    requests.post(f'https://api.telegram.org/bot{TOKEN}/sendMessage',json=data)
+        
+    return reply_markup 
+def get_lastupdate(updates):
+    last_update = updates['result'][-1]
+    chat_id = last_update['message']['chat']['id']
+    text = last_update['message']['text']
+    message_id = last_update['message']['message_id']
+    return chat_id,message_id,text
+
+def send_alternative(chat_id):
+    data2 = {
+        'chat_id':chat_id,
+        'text':'Iltimos dog yoki cat so`zini kiriting!'
+        }
+    requests.post(f'https://api.telegram.org/bot{TOKEN}/sendPhoto',json=data2)
+        
 
 
+new_message = -1
+while True:
+    updates = get_updates(TOKEN)
+    lastupdate = get_lastupdate(updates)
+    chat_id,last_message_id,text= lastupdate
 
-
-# new_message = -1
-
-# while True:
-#     updates = get_updates(TOKEN)
-#     lastupdate = get_lastupdate(updates)
-#     chat_id,text,last_message_id = lastupdate
-
-#     if new_message != last_message_id:
-#         send_message(TOKEN,chat_id=chat_id,text=text)
-#         new_message = last_message_id
+    if new_message != last_message_id:
+        if text.lower()=='😺cat' or 'cat':
+            cat(chat_id)
+            get_button(chat_id)
+        elif text.lower()=='🐶dog' or 'dog':
+            dog(chat_id)
+            get_button(chat_id)
+        elif text.lower() != 'cat' or 'dog':
+            send_alternative(chat_id)
+            get_button(chat_id)
+        
+        new_message = last_message_id
