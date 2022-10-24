@@ -29,15 +29,15 @@ def send_cat(chat_id):
         }
     requests.post(f'https://api.telegram.org/bot{TOKEN}/sendPhoto',data=data1)
 
-def send_cat_and_dog(chat_id):
-    img_url = 'https://storage.googleapis.com/petbacker/images/blog/2017/dog-and-cat-cover.jpg'
-    data = {
-        'chat_id':chat_id,
-        'photo':img_url
+# def send_cat_and_dog(chat_id):
+#     img_url = 'https://storage.googleapis.com/petbacker/images/blog/2017/dog-and-cat-cover.jpg'
+#     data = {
+#         'chat_id':chat_id,
+#         'photo':img_url
         
-        }
+#         }
     
-    requests.post(f'https://api.telegram.org/bot{TOKEN}/sendPhoto',data=data)
+#     requests.post(f'https://api.telegram.org/bot{TOKEN}/sendPhoto',data=data)
     
 
 
@@ -75,8 +75,7 @@ while True:
     chat_id,last_message_id,text= lastupdate
 
     if new_message != last_message_id:
-        if text.lower()=='cat and dog':
-            send_cat_and_dog(chat_id)
+        
         if text.lower()=='cat':
             send_cat(chat_id)
         elif text.lower()=='dog':
